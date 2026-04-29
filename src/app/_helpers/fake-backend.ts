@@ -191,17 +191,25 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
         function validateResetToken() {
             const { token } = body;
-            const account = accounts.find(x => !!x.resetToken && x.resetToken === token && new Date() < new Date(x.resetTokenExpires));
+            const account = accounts.find(x => {
+                if (!x.resetToken || x.resetToken !== token) return false;
+                const expiryDate = new Date(x.resetTokenExpires);
+                return expiryDate.getTime() > Date.now();
+            });
             
-            if (!account) return error('Inavalid Token');
+            if (!account) return error('Invalid Token');
             return ok();
         }
             
         function resetPassword() {
             const { token, password } = body;
-            const account = accounts.find(x => !!x.resetToken && x.resetToken === token && new Date() < new Date(x.resetTokenExpires));
+            const account = accounts.find(x => {
+                if (!x.resetToken || x.resetToken !== token) return false;
+                const expiryDate = new Date(x.resetTokenExpires);
+                return expiryDate.getTime() > Date.now();
+            });
 
-            if (!account) return error('Inavalid Token');
+            if (!account) return error('Invalid Token');
 
             // update password and remove reset token
             account.password = password;
@@ -353,7 +361,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     }
 
     function getRefreshToken() {
-        return document.cookie.split(';').find(x => x.includes('fakeRefreshToken')) || '=' .split('=')[1];
+        return document.cookie.split(';').find(x => x.includes('fakeRefreshToken')) || '='.split('=')[1];
     }
   }
 }

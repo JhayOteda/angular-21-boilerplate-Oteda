@@ -49,7 +49,8 @@ export class ResetPasswordComponent implements OnInit {
                     this.token = token;
                     this.tokenStatus = TokenStatus.Valid;
                 },
-                error: () => {
+                error: (err) => {
+                    console.error('Token validation error:', err);
                     this.tokenStatus = TokenStatus.Invalid;
                 }
             });
