@@ -190,16 +190,19 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         }
 
         function validateResetToken() {
-            const { token } = body;
-            const account = accounts.find(x => {
-                if (!x.resetToken || x.resetToken !== token) return false;
-                const expiryDate = new Date(x.resetTokenExpires);
-                return expiryDate.getTime() > Date.now();
-            });
-            
-            if (!account) return error('Invalid Token');
-            return ok();
-        }
+    const { token } = body;
+    
+    if (!token) return error('Token is required');
+    
+    const account = accounts.find(x => {
+        if (!x.resetToken || x.resetToken !== token) return false;
+        const expiryDate = new Date(x.resetTokenExpires);
+        return expiryDate.getTime() > Date.now();
+    });
+    
+    if (!account) return error('Invalid Token');
+    return ok();
+}
             
         function resetPassword() {
             const { token, password } = body;
@@ -257,26 +260,27 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         }
 
         function updateAccount() {
-            if (!isAuthenticated()) return unauthorized();
+    if (!isAuthenticated()) return unauthorized();
 
-            let params = body;
-            let account = accounts.find(x => x.id === idFromUrl());
+    let params = body;
+    let account = accounts.find(x => x.id === idFromUrl());
 
-            if (account.id !== currentAccount().id && !isAuthorized(Role.Admin)) {
-                return unauthorized();
-            }
+    if (account.id !== currentAccount().id && !isAuthorized(Role.Admin)) {
+        return unauthorized();
+    }
 
-            if (params.password) {
-               delete params.password;
-            }
-            
-            delete params.confirmPassword;
+    if (params.password) {
+       account.password = params.password;  // ✅ Save the new password
+    }
+    
+    delete params.password;
+    delete params.confirmPassword;
 
-            Object.assign(account, params);
-            localStorage.setItem(accountsKey, JSON.stringify(accounts));
+    Object.assign(account, params);
+    localStorage.setItem(accountsKey, JSON.stringify(accounts));
 
-            return ok(basicDetails(account));
-        }
+    return ok(basicDetails(account));
+}
 
         function deleteAccount() {
             if (!isAuthenticated()) return unauthorized();
@@ -362,8 +366,9 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     }
 
     function getRefreshToken() {
-        return document.cookie.split(';').find(x => x.includes('fakeRefreshToken')) || '='.split('=')[1];
-    }
+    const cookie = document.cookie.split(';').find(x => x.includes('fakeRefreshToken'));
+    return cookie ? cookie.split('=')[1] : '';
+}
   }
 }
 

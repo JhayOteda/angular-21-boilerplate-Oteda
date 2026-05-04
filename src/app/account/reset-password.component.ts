@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
@@ -26,10 +26,13 @@ export class ResetPasswordComponent implements OnInit {
         private route: ActivatedRoute,
         private router: Router,
         private accountService: AccountService,
-        private alertService: AlertService
+        private alertService: AlertService,
+        private cdr: ChangeDetectorRef  // ✅ ADD THIS
     ) { }
 
     ngOnInit() {
+        console.log('🚀 Reset password component initialized');
+        
         this.form = this.formBuilder.group({
             password: ['', [Validators.required, Validators.minLength(6)]],
             confirmPassword: ['', Validators.required],
@@ -38,20 +41,33 @@ export class ResetPasswordComponent implements OnInit {
         });
 
         const token = this.route.snapshot.queryParams['token'];
+        console.log('📋 Token from URL:', token);
 
-        // remove token from url to prevent http referer leakage
-        this.router.navigate([], { relativeTo: this.route, replaceUrl: true });
+        if (!token) {
+            console.error('❌ No token!');
+            this.alertService.error('No reset token provided. Please use the link from the forgot password email.');
+            this.tokenStatus = TokenStatus.Invalid;
+            return;
+        }
 
+        console.log('✅ Token found, about to validate...');
+        
         this.accountService.validateResetToken(token)
             .pipe(first())
             .subscribe({
                 next: () => {
+                    console.log('✅ Token validated successfully!');
                     this.token = token;
                     this.tokenStatus = TokenStatus.Valid;
+                    this.cdr.detectChanges();  // ✅ FORCE UPDATE VIEW
+                    
+                    // Remove token from url after view updates
+                    this.router.navigate([], { relativeTo: this.route, replaceUrl: true });
                 },
                 error: (err) => {
-                    console.error('Token validation error:', err);
+                    console.error('❌ Token validation FAILED:', err);
                     this.tokenStatus = TokenStatus.Invalid;
+                    this.cdr.detectChanges();  // ✅ FORCE UPDATE VIEW
                 }
             });
     }
