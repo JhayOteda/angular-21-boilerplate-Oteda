@@ -330,11 +330,12 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             return accounts.length ? Math.max(...accounts.map(x => x.id)) + 1 : 1;
         }
         function currentAccount() {
+
             const authHeader = headers.get('Authorization') || '';
             if (!authHeader.startsWith('Bearer fake-jwt-token')) return;
 
             const jwtToken = JSON.parse(atob(authHeader.split('.')[1]));
-            const tokenExpired = new Date(jwtToken.exp * 1000);
+            const tokenExpired = Date.now() > (jwtToken.exp * 1000);
             if (tokenExpired)return;
 
             const account = accounts.find(x => x.id === jwtToken.id);
