@@ -1,13 +1,11 @@
 # Dependencies
 node_modules/
-package-lock.json
 
 # Build output
 dist/
 *.tsbuildinfo
 
-# Configuration (SENSITIVE - contains passwords & secrets)
-config.json
+# Configuration
 .env
 .env.local
 .env.*.local
