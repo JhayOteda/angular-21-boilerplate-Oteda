@@ -1,2 +1,3 @@
-const app = require('../backend/server').default;
+const server = require('../backend/server');
+const app = server.default || server;
 module.exports = app;
