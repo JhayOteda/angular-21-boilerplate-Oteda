@@ -1,18 +1,13 @@
 {
   "version": 2,
-  "functions": {
-    "backend/server.ts": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/accounts/:path*",
-      "destination": "/backend/server.ts"
+      "destination": "/api"
     },
     {
       "source": "/api-docs/:path*",
-      "destination": "/backend/server.ts"
+      "destination": "/api"
     },
     {
       "source": "/(.*)",
