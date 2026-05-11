@@ -18,7 +18,7 @@ export default function (sequelize: any) {
         updated: { type: DataTypes.DATE, },
         isVerified: {
             type: DataTypes.VIRTUAL,
-            get() {return !!(this.verified || this.passwordReset);}
+            get() { return !!((this as any).verified || (this as any).passwordReset); }
         }
     };
 
