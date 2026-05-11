@@ -2,11 +2,19 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/accounts(.*)",
+      "source": "/accounts/(.*)",
       "destination": "/api"
     },
     {
-      "source": "/api-docs(.*)",
+      "source": "/api-docs/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/accounts",
+      "destination": "/api"
+    },
+    {
+      "source": "/api-docs",
       "destination": "/api"
     },
     {
