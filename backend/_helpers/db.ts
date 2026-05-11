@@ -14,14 +14,26 @@ async function initialize() {
         console.warn('Database initialization skipped (SKIP_DB_INIT=true)');
         return;
     }
-    const { host, port, user, password, database } = config.database;
+
+    // Use environment variables for Clever Cloud, fallback to config.json for local dev
+    const host = process.env.MYSQL_HOST || config.database.host;
+    const port = Number(process.env.MYSQL_PORT) || config.database.port;
+    const user = process.env.MYSQL_USER || config.database.user;
+    const password = process.env.MYSQL_PASSWORD || config.database.password;
+    const database = process.env.MYSQL_DATABASE || config.database.database;
+
     const connection = await mysql.createConnection({ host, port, user, password });
 
     // Create DB if it doesn't exist
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
 
     // Connect to DB
-    const sequelize = new Sequelize(database, user, password, { dialect: 'mysql' });
+    const sequelize = new Sequelize(database, user, password, { 
+        host, 
+        port, 
+        dialect: 'mysql' 
+    });
+
 
     // Init models
     db.Account = accountModel(sequelize);
