@@ -2,7 +2,15 @@
   "version": 2,
   "rewrites": [
     {
+      "source": "/accounts",
+      "destination": "/api"
+    },
+    {
       "source": "/accounts/:path*",
+      "destination": "/api"
+    },
+    {
+      "source": "/api-docs",
       "destination": "/api"
     },
     {
