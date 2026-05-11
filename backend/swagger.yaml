@@ -5,8 +5,8 @@ info:
   version: 1.0.0
 
 servers:
-  - url: http://localhost:4000
-    description: Local development server
+  - url: https://angular-21-boilerplate-oteda.vercel.app
+    description: Vercel production server
 
 paths:
   /accounts/authenticate:
